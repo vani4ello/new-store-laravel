@@ -19,7 +19,17 @@
     </header>
 
     <main>
-        @yield('content')
+    {{-- Блок для відображення flash-повідомлень --}}
+    @if(session('success'))
+        <div class="container mx-auto mt-4">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                <span class="block sm:inline">{{ session('success') }}</span>
+            </div>
+        </div>
+    @endif
+    {{-- Кінець блоку --}}
+
+    @yield('content')
     </main>
 
     <footer class="bg-white mt-8 py-4">
