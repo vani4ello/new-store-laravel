@@ -1,6 +1,5 @@
 <!-- resources/views/products/show.blade.php -->
 
-{{-- Припустимо, у вас є базовий layout --}}
 @extends('layouts.app') 
 
 @section('content')
@@ -24,9 +23,17 @@
             @foreach($product->listings as $listing)
                 <div class="border p-4 rounded-lg flex justify-between items-center">
                     <div>
-                        {{-- В майбутньому тут буде назва продавця --}}
                         <p class="font-semibold">Пропозиція #{{ $listing->id }}</p> 
-                        <p>Тип: {{ $listing->type }}</p>  {{-- Припускаючи, що у вас є Enum для типу --}}
+                        <p class="text-sm text-gray-600">
+                            {{-- Блок з детальною інформацією про пропозицію --}}
+                            Тип: {{ $listing->type->value }} | 
+                            Статус: <span class="{{ $listing->is_active ? 'text-green-600 font-medium' : 'text-red-600 font-medium' }}">{{ $listing->is_active ? 'Активна' : 'Неактивна' }}</span>
+                            
+                            {{-- Показуємо кількість тільки для лімітованих товарів --}}
+                            @if($listing->type === \Src\Catalog\Enums\ListingType::LIMITED)
+                                | Кількість на складі: {{ $listing->quantity }}
+                            @endif
+                        </p>
                     </div>
                     <div>
                         <p class="text-xl font-bold">{{ $listing->price }} грн</p>
