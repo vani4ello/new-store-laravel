@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -10,19 +11,32 @@ use App\Http\Controllers\CartController;
 |--------------------------------------------------------------------------
 */
 
+// --- Головна сторінка ---
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('home');
 
-// Маршрут для сторінки каталогу
+
+// --- Маршрути Каталогу Товарів ---
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-
-// Маршрут для сторінки конкретного товару
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 
+// --- Маршрути Кошика ---
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
 
-Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update'); // <-- Новий маршрут
-Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove'); // <-- Новий маршру
+
+// --- Маршрути Оформлення Замовлення (Checkout) ---
+// Вся логіка тепер об'єднана в OrderController для чистоти та консистентності
+
+// Відображення сторінки оформлення замовлення
+Route::get('/checkout', [OrderController::class, 'index'])->name('checkout.index'); // <-- ЦЕЙ РЯДОК ПОТРІБНО БУЛО ВИПРАВИТИ
+
+// Обробка даних з форми та створення замовлення
+Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
+
+// Сторінка успішного створення замовлення ("Дякуємо за покупку")
+Route::get('/checkout/success/{order}', [OrderController::class, 'success'])->name('checkout.success');

@@ -59,7 +59,7 @@
         </div>
 
         <div class="flex justify-end mt-6">
-            <a href="#" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
+        <a href="{{ route('checkout.index') }}" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700">
                 Оформити замовлення
             </a>
         </div>
