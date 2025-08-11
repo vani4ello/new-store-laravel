@@ -8,6 +8,7 @@ use Src\Catalog\Models\Brand;
 use Src\Catalog\Models\Category;
 use Src\Catalog\Models\Listing;
 use Src\Catalog\Models\Product;
+use Src\Catalog\Enums\ListingType;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,11 +19,12 @@ class DatabaseSeeder extends Seeder
         $brands = Brand::factory(10)->create();
         $categories = Category::factory(15)->create();
 
-        // Крок 2: Створюємо товари. Поки що без зв'язків.
+        // Крок 2: Створюємо товари
         $products = Product::factory(50)->create();
 
-        // Крок 3: Тепер, коли все створено, проходимо по товарах і додаємо зв'язки
-        $user = User::first(); // Отримуємо нашого створеного користувача
+        // Крок 3: Прив'язуємо дані та створюємо пропозиції
+        $user = User::firstOrFail();
+        $isFirstProduct = true;
 
         foreach ($products as $product) {
             // Присвоюємо бренд
@@ -33,10 +35,26 @@ class DatabaseSeeder extends Seeder
             $product->categories()->attach($categories->random(rand(1, 3))->pluck('id'));
 
             // Створюємо пропозиції
-            Listing::factory(rand(1, 2))->create([
-                'product_id' => $product->id,
-                'user_id' => $user->id,
-            ]);
+            $listingCount = rand(1, 2);
+
+            if ($isFirstProduct) {
+                Listing::factory()->create([
+                    'product_id' => $product->id,
+                    'user_id' => $user->id,
+                    'type' => ListingType::UNLIMITED->value,
+                    'quantity' => 0,
+                ]);
+                $isFirstProduct = false;
+                $listingCount--;
+            }
+            
+            if ($listingCount > 0) {
+                Listing::factory($listingCount)->create([
+                    'product_id' => $product->id,
+                    'user_id' => $user->id,
+                    'type' => ListingType::LIMITED->value,
+                ]);
+            }
         }
     }
 }

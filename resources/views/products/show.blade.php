@@ -6,7 +6,6 @@
     {{-- Інформація про "Вікі-картку" товару --}}
     <h1 class="text-3xl font-bold mb-2">{{ $product->name }}</h1>
     
-    {{-- Виводимо Бренд та Категорії --}}
     <div class="text-gray-600 mb-4">
         <span>Бренд: {{ $product->brand?->name }}</span>
         
@@ -15,7 +14,6 @@
             <span>
                 Категорії:
                 @foreach($product->categories as $category)
-                    {{-- Виводимо назву категорії і додаємо кому, якщо це не остання категорія в списку --}}
                     {{ $category->name }}{{ !$loop->last ? ',' : '' }}
                 @endforeach
             </span>
@@ -46,21 +44,36 @@
                             @endif
                         </p>
                     </div>
-                    <div>
-                        <form action="{{ route('cart.add') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="listing_id" value="{{ $listing->id }}">
-                            
-                            <p class="text-xl font-bold mb-2">{{ $listing->price }} грн</p>
-                            
-                            <div class="flex items-center">
+                    
+                    {{-- ================= ПОЧАТОК ЗМІН ================= --}}
+                    
+                    <div class="w-1/3 text-right">
+                        <p class="text-2xl font-bold mb-2">{{ number_format($listing->price / 100, 2, ',', ' ') }} грн</p>
+                        
+                        @if($listing->type === \Src\Catalog\Enums\ListingType::UNLIMITED || $listing->quantity > 0)
+                            {{-- Якщо товар нескінченний АБО його кількість більша за 0, показуємо активну форму --}}
+                            <form action="{{ route('cart.add') }}" method="POST" class="flex items-center justify-end">
+                                @csrf
+                                <input type="hidden" name="listing_id" value="{{ $listing->id }}">
+                                
                                 <input type="number" name="quantity" value="1" min="1" class="w-20 rounded border-gray-300 mr-2 text-center">
                                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                                     Додати
                                 </button>
+                            </form>
+                        @else
+                            {{-- Інакше показуємо неактивну кнопку --}}
+                            <div class="flex items-center justify-end">
+                                <input type="number" value="1" min="1" class="w-20 rounded border-gray-300 mr-2 text-center bg-gray-100" disabled>
+                                <button type="button" class="bg-gray-400 text-white px-4 py-2 rounded cursor-not-allowed" disabled>
+                                    Немає в наявності
+                                </button>
                             </div>
-                        </form>
+                        @endif
                     </div>
+                    
+                    {{-- ================= КІНЕЦЬ ЗМІН ================= --}}
+
                 </div>
             @endforeach
         </div>
