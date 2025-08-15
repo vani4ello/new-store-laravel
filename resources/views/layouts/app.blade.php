@@ -1,80 +1,97 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>{{ config('app.name', 'New-Store') }}</title>
 
-    <!-- Scripts and Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'] )
+    @livewireStyles
 </head>
-<body class="bg-gray-100 font-sans leading-normal tracking-normal">
+<body class="font-sans antialiased bg-gray-900 text-gray-200">
+    <div class="min-h-screen">
+        <!-- Navigation Menu -->
+        <nav class="bg-gray-800/50 backdrop-blur-lg sticky top-0 z-50 border-b border-gray-700/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <a href="{{ route('home') }}" class="text-white font-bold text-xl">
+                                NEW-STORE
+                            </a>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="{{ route('products.index') }}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Каталог</a>
+                                <!-- Add other nav links here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="{{ route('cart.index') }}" class="text-gray-300 hover:text-white relative p-2 rounded-full hover:bg-gray-700">
+                            <span class="sr-only">View cart</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            <livewire:cart-counter />
+                        </a>
 
-    <header class="bg-white shadow">
-        <div class="container mx-auto px-4">
-            {{-- ================= ПОЧАТОК ЗМІН ================= --}}
+                        @guest
+                            <a href="{{ route('auth') }}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Вхід</a>
+                        @endguest
 
-            <div class="flex justify-between items-center py-4">
-                {{-- Логотип / Назва магазину --}}
-                <a href="{{ route('products.index') }}" class="text-xl font-bold text-gray-800">
-                    New-Store
-                </a>
-
-                {{-- Навігація та Кошик --}}
-                <div class="flex items-center space-x-6">
-                    {{-- Тут можуть бути інші посилання, наприклад:
-                    <a href="#" class="text-gray-600 hover:text-gray-800">Про нас</a>
-                    <a href="#" class="text-gray-600 hover:text-gray-800">Контакти</a>
-                    --}}
-                    
-                    {{-- Іконка кошика з лічильником --}}
-                    <a href="{{ route('cart.index') }}" class="relative text-gray-600 hover:text-gray-800">
-                        {{-- SVG іконка кошика --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        
-                        {{-- Червоний кружечок-лічильник --}}
-                        @if (isset($cartTotalQuantity) && $cartTotalQuantity > 0)
-                            <span class="absolute -top-2 -right-2 flex items-center justify-center h-5 w-5 bg-red-500 text-white text-xs rounded-full">
-                                {{ $cartTotalQuantity }}
-                            </span>
-                        @endif
-                    </a>
+                        @auth
+                            <a href="{{ route('account.orders') }}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Акаунт</a>
+                        @endauth
+                    </div>
                 </div>
             </div>
-            
-            {{-- ================= КІНЕЦЬ ЗМІН ================= --}}
+        </nav>
+
+        <!-- Page Content -->
+        <main>
+            @yield('content')
+        </main>
+    </div>
+
+    <!-- Flash Messages -->
+    @if (session('status'))
+        <div x-data="{ show: true }"
+             x-init="setTimeout(() => show = false, 4000)"
+             x-show="show"
+             x-transition:enter="transform ease-out duration-300 transition"
+             x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+             x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-100"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed bottom-0 right-0 p-4 m-4 bg-green-600/80 backdrop-blur-sm text-white rounded-lg shadow-lg"
+             role="alert">
+            <p>
+                @switch(session('status'))
+                    @case('profile-updated')
+                        Профіль успішно оновлено!
+                        @break
+                    @case('password-updated')
+                        Пароль успішно оновлено!
+                        @break
+                    @case('account-deleted')
+                        Ваш акаунт було видалено.
+                        @break
+                    @default
+                        {{ session('status') }}
+                @endswitch
+            </p>
         </div>
-    </header>
+    @endif
 
-    <main>
-        {{-- Блок для відображення flash-повідомлень --}}
-        @if(session('success'))
-            <div class="container mx-auto mt-4 px-4">
-                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">{{ session('success') }}</span>
-                </div>
-            </div>
-        @endif
-        
-        @if(session('info'))
-            <div class="container mx-auto mt-4 px-4">
-                <div class="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative" role="alert">
-                    <span class="block sm:inline">{{ session('info') }}</span>
-                </div>
-            </div>
-        @endif
-        {{-- Кінець блоку --}}
 
-        @yield('content')
-    </main>
-
-    <footer class="bg-white mt-8 py-4">
-        <div class="container mx-auto text-center text-gray-500">
-            &copy; {{ date('Y') }} New-Store. Всі права захищено.
-        </div>
-    </footer>
-
+    @livewireScripts
 </body>
 </html>

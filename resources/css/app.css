@@ -1,11 +1,40 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* Pixel icon aesthetic */
+.pixel-icon {
+    image-rendering: pixelated;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* Neon outline on focus */
+.focus-neon:focus {
+    outline: 2px solid rgba(0,255,170,0.14);
+    box-shadow: 0 0 12px rgba(0,255,170,0.08);
+}
+
+/* Ensure grid items are properly sized */
+.grid > * {
+    min-width: 0;
+    width: 100%;
+}
+
+/* Debug grid */
+.grid {
+    display: grid !important;
+}
+
+/* Ensure product cards don't overflow */
+.product-card {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+}
+
+.product-card .h-48 {
+    height: 16rem; /* 16rem = 256px */
 }
