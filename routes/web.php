@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\HomeController;
 // Підключаємо нові контролери
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
@@ -16,9 +17,7 @@ use App\Http\Controllers\AuthController;
 */
 
 // --- Головна сторінка ---
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 
 // --- Маршрути Каталогу Товарів ---
@@ -26,19 +25,27 @@ Route::get('/products', [ProductController::class, 'index'])->name('products.ind
 Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 
 
-// --- Маршрути Кошика ---
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
-Route::patch('/cart/update', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
+// --- Маршрути Кошика (захищені auth middleware) ---
+Route::prefix('cart')
+    ->middleware('auth')
+    ->name('cart.')
+    ->group(function () {
+        Route::get('/', [CartController::class, 'index'])->name('index');
+        Route::post('/add', [CartController::class, 'add'])->name('add');
+        Route::patch('/update', [CartController::class, 'update'])->name('update');
+        Route::delete('/remove', [CartController::class, 'remove'])->name('remove');
+    });
 
 
 // --- Маршрути Оформлення Замовлення (Checkout) ---
-// --- Маршрути Оформлення Замовлення (Checkout) ---
-Route::get('/checkout', [OrderController::class, 'index'])->name('checkout.index');
-Route::post('/checkout', [OrderController::class, 'store'])->name('checkout.store');
-Route::get('/checkout/success/{order}', [OrderController::class, 'success'])->name('checkout.success');
-
+Route::prefix('checkout')
+    ->middleware('auth')
+    ->name('checkout.')
+    ->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::post('/', [OrderController::class, 'store'])->name('store');
+        Route::get('/success/{order}', [OrderController::class, 'success'])->name('success');
+    });
 
 
 // --- Маршрути Аутентифікації ---
@@ -48,7 +55,7 @@ Route::post('/login', [AuthController::class, 'login'])->middleware('guest')->na
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 
-// --- Маршрути Особистого кабінету (НОВА, ПОВНА ВЕРСІЯ) ---
+// --- Маршрути Особистого кабінету ---
 Route::prefix('account')
     ->middleware('auth')
     ->name('account.')
